@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Albüm - Wextra Hub</title>
+    <link rel="icon" href="https://cdn.glitch.global/efcfd317-be4a-4dfc-965c-75b2d45b5e6f/wh.png?v=1747695221326">
+    <style>
+        :root {
+          --bg-color: #121212;
+          --text-color: #e0e0e0;
+          --card-color: #1e1e1e;
+          --link-color: #90caf9;
+          --link-hover: #42a5f5;
+        }
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        body {
+          font-family: 'Segoe UI', sans-serif;
+          background: var(--bg-color);
+          color: var(--text-color);
+          line-height: 1.6;
+          padding: 20px;
+          min-height: 100vh;
+        }
+        header {
+          text-align: center;
+          margin-bottom: 40px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0 20px;
+        }
+        .logo {
+          font-size: 2.8rem;
+          font-weight: bold;
+          display: inline-block;
+          cursor: pointer;
+        }
+        .logo .white {
+          background: #121212;
+          color: #fff;
+          padding: 6px 12px;
+        }
+        .logo .orange {
+          background: orange;
+          color: #000;
+          padding: 6px 12px;
+          border-radius: 8px;
+        }
+        .back-button {
+          background: var(--card-color);
+          border: none;
+          color: var(--text-color);
+          padding: 10px 20px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 16px;
+          transition: background 0.2s;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .back-button:hover {
+          background: #333;
+        }
+        .user-menu {
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          position: relative;
+        }
+        .user-menu .avatar {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          margin-right: 15px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          font-size: 18px;
+          color: #fff;
+          position: relative;
+        }
+        .avatar.admin {
+          background: linear-gradient(45deg, #ff4444, #ff6666);
+          border: 2px solid #ff2222;
+        }
+        .avatar.vip {
+          background: linear-gradient(45deg, #ffcc00, #ffdd33);
+          border: 2px solid #ffaa00;
+          color: #000;
+        }
+        .avatar.user {
+          background: linear-gradient(45deg, #4a90e2, #6ba3f0);
+          border: 2px solid #3578d4;
+        }
+        .logout-menu {
+          position: absolute;
+          top: calc(100% + 8px);
+          right: 0;
+          background: var(--card-color);
+          border-radius: 8px;
+          padding: 10px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+          display: none;
+          min-width: 140px;
+          z-index: 1000;
+        }
+        .logout-menu button {
+          background: none;
+          border: none;
+          color: var(--text-color);
+          padding: 10px 15px;
+          border-radius: 4px;
+          cursor: pointer;
+          width: 100%;
+          text-align: left;
+          transition: background 0.2s;
+        }
+        .logout-menu button:hover {
+          background: #333;
+        }
+        .album-container {
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+        .album-info {
+          text-align: center;
+          margin-bottom: 30px;
+        }
+        .album-title {
+          font-size: 2rem;
+          font-weight: bold;
+          margin-bottom: 10px;
+        }
+        .album-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+          gap: 20px;
+          margin-top: 20px;
+        }
+        .media-item {
+          background: var(--card-color);
+          border-radius: 12px;
+          overflow: hidden;
+          position: relative;
+          cursor: pointer;
+          transition: transform 0.3s ease;
+        }
+        .media-item:hover {
+          transform: translateY(-5px);
+        }
+        .media-content {
+          width: 100%;
+          height: 200px;
+          object-fit: cover;
+          display: block;
+          background: #333;
+        }
+        .media-overlay {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: rgba(0,0,0,0.7);
+          border-radius: 50%;
+          width: 60px;
+          height: 60px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 24px;
+          color: white;
+          opacity: 0;
+          transition: opacity 0.3s;
+        }
+        .media-item:hover .media-overlay {
+          opacity: 1;
+        }
+        .modal {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0,0,0,0.95);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 2000;
+        }
+        .modal-content {
+          position: relative;
+          max-width: 90vw;
+          max-height: 90vh;
+          background: #000;
+          border-radius: 12px;
+          overflow: hidden;
+        }
+        .close {
+          position: absolute;
+          top: 15px;
+          right: 15px;
+          font-size: 28px;
+          cursor: pointer;
+          color: white;
+          z-index: 2001;
+          background: rgba(0,0,0,0.7);
+          border-radius: 50%;
+          width: 45px;
+          height: 45px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background 0.2s;
+        }
+        .close:hover {
+          background: rgba(0,0,0,0.9);
+        }
+        .modal-navigation {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          background: rgba(0,0,0,0.7);
+          border: none;
+          color: white;
+          font-size: 28px;
+          padding: 15px 20px;
+          cursor: pointer;
+          border-radius: 8px;
+          transition: background 0.3s;
+          z-index: 2001;
+        }
+        .modal-navigation:hover {
+          background: rgba(0,0,0,0.9);
+        }
+        .modal-prev {
+          left: 20px;
+        }
+        .modal-next {
+          right: 20px;
+        }
+        .modal img {
+          max-width: 100%;
+          max-height: 90vh;
+          display: block;
+          margin: 0 auto;
+          pointer-events: none;
+          user-select: none;
+        }
+        .modal video {
+          max-width: 100%;
+          max-height: 90vh;
+          display: block;
+          margin: 0 auto;
+          outline: none;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+          header {
+            flex-direction: column;
+            gap: 20px;
+            padding: 0;
+          }
+          .back-button {
+            order: -1;
+            align-self: flex-start;
+          }
+          .album-grid {
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+          }
+          .media-content {
+            height: 150px;
+          }
+          .album-title {
+            font-size: 1.6rem;
+          }
+          .modal-navigation {
+            font-size: 24px;
+            padding: 12px 16px;
+          }
+          .modal-prev {
+            left: 10px;
+          }
+          .modal-next {
+            right: 10px;
+          }
+          .close {
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            font-size: 24px;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          .album-grid {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+          }
+          .media-content {
+            height: 120px;
+          }
+          .modal-navigation {
+            display: none;
+          }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <button class="back-button" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i> Geri
+        </button>
+        <div class="logo" onclick="goHome()">
+            <span class="white">Wextra</span><span class="orange">Hub</span>
+        </div>
+        <div class="user-menu" id="user-menu">
+            <div class="avatar" id="user-avatar"></div>
+            <span id="username-display">Kullanıcı</span>
+            <div class="logout-menu" id="logout-menu">
+                <button onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Çıkış Yap
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="album-container">
+        <div class="album-info">
+            <h1 class="album-title" id="album-title">Albüm Yükleniyor...</h1>
+        </div>
+
+        <div class="album-grid" id="album-grid">
+            <!-- Bu kısım JavaScript ile doldurulacak -->
+        </div>
+    </div>
+
+    <script>
+        // Media Config - Tüm albüm içerikleri burada tanımlanıyor
+        const MEDIA_CONFIG = {
+            // Ana albüm - herkes görebilir
+            'hadise': {
+                name: 'Hadise',
+                access: ['user','vip', 'admin'],
+                media: [
+                    {
+                        type: 'video',
+                        src: 'https://cdn.glitch.global/efcfd317-be4a-4dfc-965c-75b2d45b5e6f/hds.mp4?v=1747596115857',
+                        name: 'Hadise'
+                    },
+                    {
+                        type: 'video',
+                        src: 'https://cdn.glitch.global/efcfd317-be4a-4dfc-965c-75b2d45b5e6f/hds2.mp4?v=1747596292038',
+                        name: 'Hadise'
+                    },
+                    {
+                        type: 'video',
+                        src: 'https://cdn.glitch.global/efcfd317-be4a-4dfc-965c-75b2d45b5e6f/hds3.mp4?v=1747596429926',
+                        name: 'Hadise'
+                    }
+                ]
+            },
+
+            // VIP özel albümü
+            'sıla.ertaş': {
+                name: 'Sıla Ertaş',
+                access: ['vip', 'admin'],
+                media: [
+                    {
+                        type: 'video',
+                        src: 'https://cdn.glitch.me/efcfd317-be4a-4dfc-965c-75b2d45b5e6f/ertassla?v=1747401068396',
+                        name: 'Sıla Ertaş'
+                    }
+                ]
+            },
+'şeker': {
+                name: 'Şeker',
+                access: ['vip', 'admin'],
+                media: [
+                    {
+                        type: 'video',
+                        src: 'assets/1.mp4',
+                        name: 'Şeker'
+                    }
+                ]
+            },
+            'hande.erçel': {
+                name: 'Hande Erçel',
+                access: ['vip', 'admin'],
+                media: [
+                    {
+                        type: 'video',
+                        src: 'https://cdn.glitch.me/efcfd317-be4a-4dfc-965c-75b2d45b5e6f/hande.mp4?v=1747760556228',
+                        name: 'Hande Erçel'
+                    },
+                    {
+                        type: 'video',
+                        src: 'https://cdn.glitch.me/efcfd317-be4a-4dfc-965c-75b2d45b5e6f/hande2.mp4?v=1747762386054',
+                        name: 'Hande Erçel'
+                    },
+{
+                        type: 'video',
+                        src: 'assets/2.mp4',
+                        name: 'Hande Erçel'
+                    }
+                ]
+            },
+
+            // Admin özel albümü
+            'archive_admin': {
+                name: 'Admin Özel Albüm',
+                access: ['admin'],
+                media: [
+                    {
+                        type: 'image',
+                        src: '/api/placeholder/1000/800',
+                        name: 'Admin Resim 1'
+                    },
+                    {
+                        type: 'video',
+                        src: 'https://cdn.glitch.global/efcfd317-be4a-4dfc-965c-75b2d45b5e6f/hds.mp4?v=1747596115857',
+                        name: 'Admin Video'
+                    },
+                    {
+                        type: 'image',
+                        src: '/api/placeholder/800/1000',
+                        name: 'Admin Resim 2'
+                    }
+                ]
+            }
+        };
+
+        let currentAlbumData = null;
+        let currentMediaIndex = 0;
+        let currentUserData = null;
+        let albumId = null;
+
+        // Sayfa yüklendiğinde
+        window.addEventListener('load', function() {
+            checkAuth();
+            getAlbumId();
+            loadAlbumContent();
+        });
+
+        // Kullanıcı kimlik doğrulama
+        function checkAuth() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (!savedUser) {
+                window.location.href = '/';
+                return;
+            }
+            
+            currentUserData = JSON.parse(savedUser);
+            document.getElementById('username-display').textContent = currentUserData.username;
+            
+            // Avatar ayarla
+            const avatar = document.getElementById('user-avatar');
+            avatar.className = `avatar ${currentUserData.userType}`;
+            avatar.textContent = currentUserData.username.charAt(0).toUpperCase();
+        }
+
+        // URL'den albüm ID'sini al
+        function getAlbumId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            albumId = urlParams.get('id');
+            
+            if (!albumId || !MEDIA_CONFIG[albumId]) {
+                window.location.href = '/';
+                return;
+            }
+            
+            // Erişim kontrolü
+            const albumConfig = MEDIA_CONFIG[albumId];
+            if (!albumConfig.access.includes(currentUserData.userType)) {
+                alert('Bu albüme erişim yetkiniz yok!');
+                window.location.href = '/';
+                return;
+            }
+            
+            currentAlbumData = albumConfig;
+        }
+
+        // Albüm içeriğini yükle
+        function loadAlbumContent() {
+            if (!currentAlbumData) return;
+
+            // Albüm başlığını güncelle
+            document.getElementById('album-title').textContent = currentAlbumData.name;
+
+            // Medya grid'ini yükle
+            const albumGrid = document.getElementById('album-grid');
+            albumGrid.innerHTML = '';
+
+            currentAlbumData.media.forEach((media, index) => {
+                const mediaItem = document.createElement('div');
+                mediaItem.classList.add('media-item');
+                mediaItem.onclick = () => openModal(index);
+
+                if (media.type === 'image') {
+                    mediaItem.innerHTML = `
+                        <img src="${media.src}" alt="${media.name}" class="media-content" loading="lazy">
+                        <div class="media-overlay">
+                            <i class="fas fa-search-plus"></i>
+                        </div>
+                    `;
+                } else if (media.type === 'video') {
+                    const video = document.createElement('video');
+                    video.src = media.src;
+                    video.muted = true;
+                    video.className = 'media-content';
+                    video.addEventListener('loadeddata', function() {
+                        this.currentTime = 0.1; // İlk karenin görünmesi için
+                    });
+
+                    mediaItem.innerHTML = `
+                        <div class="media-overlay">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    `;
+                    mediaItem.insertBefore(video, mediaItem.firstChild);
+                }
+
+                albumGrid.appendChild(mediaItem);
+            });
+        }
+
+        // Modal açma
+        function openModal(index) {
+            currentMediaIndex = index;
+            showMediaInModal(currentAlbumData.media[index]);
+        }
+
+        // Modal içinde medya gösterme
+        function showMediaInModal(media) {
+            // Mevcut modal varsa kaldır
+            const existingModal = document.querySelector('.modal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+
+            const modal = document.createElement('div');
+            modal.classList.add('modal');
+            
+            if (media.type === 'image') {
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <button class="modal-navigation modal-prev" onclick="previousMedia()">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="modal-navigation modal-next" onclick="nextMedia()">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <img src="${media.src}" alt="${media.name}">
+                    </div>
+                `;
+            } else if (media.type === 'video') {
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <button class="modal-navigation modal-prev" onclick="previousMedia()">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="modal-navigation modal-next" onclick="nextMedia()">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <video controls autoplay controlslist="nodownload" >
+                            <source src="${media.src}" type="video/mp4">
+                            Tarayıcınız video elementini desteklemiyor.
+                        </video>
+                    </div>
+                `;
+            }
+
+            document.body.appendChild(modal);
+
+            // Modal kapatma
+            modal.querySelector('.close').onclick = function() {
+                const video = modal.querySelector('video');
+                if (video) {
+                    video.pause();
+                }
+                modal.remove();
+                document.removeEventListener('keydown', handleKeyNavigation);
+            };
+
+            // Modal dışına tıklayınca kapatma
+            modal.onclick = function(e) {
+                if (e.target === modal) {
+                    const video = modal.querySelector('video');
+                    if (video) {
+                        video.pause();
+                    }
+                    modal.remove();
+                    document.removeEventListener('keydown', handleKeyNavigation);
+                }
+            };
+
+            // Klavye navigasyonu
+            document.addEventListener('keydown', handleKeyNavigation);
+        }
+
+        // Önceki medya
+        function previousMedia() {
+            currentMediaIndex = (currentMediaIndex - 1 + currentAlbumData.media.length) % currentAlbumData.media.length;
+            showMediaInModal(currentAlbumData.media[currentMediaIndex]);
+        }
+
+        // Sonraki medya
+        function nextMedia() {
+            currentMediaIndex = (currentMediaIndex + 1) % currentAlbumData.media.length;
+            showMediaInModal(currentAlbumData.media[currentMediaIndex]);
+        }
+
+        // Klavye navigasyonu
+        function handleKeyNavigation(e) {
+            const modal = document.querySelector('.modal');
+            if (!modal) return;
+
+            switch(e.key) {
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    previousMedia();
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    nextMedia();
+                    break;
+                case 'Escape':
+                    e.preventDefault();
+                    const video = modal.querySelector('video');
+                    if (video) {
+                        video.pause();
+                    }
+                    modal.remove();
+                    document.removeEventListener('keydown', handleKeyNavigation);
+                    break;
+            }
+        }
+
+        // Geri dönme
+        function goBack() {
+            window.history.back();
+        }
+
+        // Ana sayfaya dönme
+        function goHome() {
+            window.location.href = '/';
+        }
+
+        // Çıkış yapma
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = '/';
+        }
+
+        // Kullanıcı menüsü toggle
+        document.getElementById('user-menu').addEventListener('click', function(e) {
+            e.stopPropagation();
+            const logoutMenu = document.getElementById('logout-menu');
+            logoutMenu.style.display = logoutMenu.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Dışarı tıklayınca menüyü kapat
+        document.addEventListener('click', function() {
+            document.getElementById('logout-menu').style.display = 'none';
+        });
+
+        // Güvenlik önlemleri
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && e.key === 'I') || 
+                (e.ctrlKey && e.shiftKey && e.key === 'C') || 
+                (e.ctrlKey && e.key === 'u') ||
+                (e.ctrlKey && e.key === 's') ||
+                (e.ctrlKey && e.key === 'a') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'J')) {
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('dragstart', function(e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener('selectstart', function(e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener('copy', function(e) {
+            e.preventDefault();
+        });
+    </script>
+</body>
+</html>
